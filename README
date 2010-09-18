@@ -1,0 +1,4 @@
+hax-tools:
+	some hacking tools that i have written over the years.
+	
+	revdns: returns reverse-dns information over a given pool.
