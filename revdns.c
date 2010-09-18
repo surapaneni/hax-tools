@@ -13,10 +13,27 @@ int resolve_pool(char * pool[]) {
 		sprintf(IP,"%d.%d.%d.%d%c",atoi(pool[0]),atoi(pool[1]),atoi(pool[2]),i,'\0');
 		addr = inet_addr(IP);
 		hst = gethostbyaddr(&addr,sizeof(in_addr_t),AF_INET);
-		if(hst)
-			if(hst->h_name)
-				printf("%s: %s\n",IP,hst->h_name);
-		
+		if(hst) {
+			if(hst->h_name) {
+				struct hostent * fwhst;
+				printf("\n%s: %s ",IP,hst->h_name);
+				fwhst = gethostbyname(hst->h_name);
+				if(fwhst) {
+					if(fwhst->h_name) {
+						printf(" FW: %s ", fwhst->h_name);
+					}
+					if(fwhst->h_aliases) {
+						char * alias;
+						printf(" ALIAS:");
+						while((alias = *(fwhst->h_aliases++))) {
+							printf(" %s",alias);
+						}
+						printf("\n");
+					}
+				}
+				
+			}
+		}
 	}
 	return 0;
 }
