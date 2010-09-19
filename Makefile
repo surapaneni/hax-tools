@@ -1,10 +1,13 @@
 CC=	gcc
 CFLAGS=	-std=c99
 
-tools:	revdns
+tools:	revdns soc_times
 
 revdns:	revdns.c
 	$(CC) $(CFLAGS) revdns.c -o $@
 
+soc_times:	soc_times.c
+	$(CC) $(CFLAGS) soc_times.c -o $@
+
 clean:
-	rm -f revdns
+	rm -f revdns soc_times

@@ -2,3 +2,7 @@ hax-tools:
 	some hacking tools that i have written over the years.
 	
 	revdns: returns reverse-dns information over a given pool.
+
+	soc_times: returns cpu clock times for connect(2) of given IP's
+	
+	
