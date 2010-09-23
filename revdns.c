@@ -5,9 +5,8 @@
 
 int resolve_pool(char * pool[]) {
 	char * IP;
-	int ip,i;
 	IP = (char *)calloc(1,sizeof(char)*16);
-	for(i=0;i<256;i++) {
+	for(int i=0;i<256;i++) {
 		in_addr_t addr;
 		struct hostent * hst;
 		sprintf(IP,"%d.%d.%d.%d%c",atoi(pool[0]),atoi(pool[1]),atoi(pool[2]),i,'\0');

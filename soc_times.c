@@ -42,7 +42,7 @@ void print_timediff(const struct timespec * end, const struct timespec * start) 
 
 void process_file(const char * file,const char * port) {
 	FILE * fp;
-	char *line,*line2;
+	char *line,*line2,*buf;
 	if((fp = fopen(file,"r")) == NULL) {
 		perror("fopen");
 		exit(EXIT_FAILURE);
@@ -50,7 +50,8 @@ void process_file(const char * file,const char * port) {
 	while(!feof(fp)){
 		int len;
 		line = (char *)calloc(1, 128 * sizeof(char));
-		fgets(line,128,fp);
+		buf = fgets(line,128,fp);
+		if(!buf) { return; }
 		len = strlen(line);
 		line[len-1] = '\0';
 		line2 = trimwhitespace(line);
