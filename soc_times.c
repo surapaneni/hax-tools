@@ -121,7 +121,7 @@ int main(int argc, char * argv[]) {
 			case '?':
 			default:
 					usage();
-					return EXIT_FAILURE;		
+					return EXIT_SUCCESS;
 		}
 	}
 	
@@ -129,6 +129,7 @@ int main(int argc, char * argv[]) {
 		process_file(file_name,port);
 		return EXIT_SUCCESS;;
 	} 
+	usage();
 	return EXIT_FAILURE;		
 }
 
