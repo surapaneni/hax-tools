@@ -92,6 +92,10 @@ void connect_times(const char * host,const char * port) {
 			continue;
 		}
 		err = clock_gettime(CLOCK_REALTIME,&end);
+		if(err) {
+			printf("%s\n",gai_strerror(err));
+			return;
+		}
 		close(sockfd);
 		print_timediff(&end,&start);
 	}
@@ -117,14 +121,15 @@ int main(int argc, char * argv[]) {
 			case '?':
 			default:
 					usage();
-			
+					return EXIT_FAILURE;		
 		}
 	}
 	
-	if(file_name) {
+	if(file_name && port) {
 		process_file(file_name,port);
-	}
-	return 0;		
+		return EXIT_SUCCESS;;
+	} 
+	return EXIT_FAILURE;		
 }
 
 char * trimwhitespace(char * str) {
