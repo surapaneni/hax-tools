@@ -1,0 +1,4 @@
+1. Test on more systems.
+   Currently known to work on NetBSD
+2. Use alternates for clock_gettime on Mac OS X
+
