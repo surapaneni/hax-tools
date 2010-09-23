@@ -62,7 +62,7 @@ void process_file(const char * file,const char * port) {
 		len = strlen(line);
 		line[len-1] = '\0';
 		line2 = trimwhitespace(line);
-		if(line2) connect_times(line2,port);
+		if(line2 && connect_flag) connect_times(line2,port);
 		free(line);
 	}
 	
