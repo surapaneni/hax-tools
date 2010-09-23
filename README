@@ -3,6 +3,6 @@ hax-tools:
 	
 	revdns: returns reverse-dns information over a given pool.
 
-	soc_times: returns cpu clock times for connect(2) of given IP's
+	soc_times: returns POSIX Wall clock times for connect(2) for given IP's
 	
 	
