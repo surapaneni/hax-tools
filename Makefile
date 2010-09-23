@@ -11,8 +11,11 @@ tools:	revdns soc_times
 revdns:	revdns.c
 	$(CC) $(CFLAGS) revdns.c -o $@
 
-soc_times:	soc_times.c
-	$(CC) $(soc_times_CFLAGS) $(soc_times_LDFLAGS) soc_times.c -o $@
+soc_times:	soc_times.c hostlist.o
+	$(CC) $(soc_times_CFLAGS) $(soc_times_LDFLAGS) hostlist.o soc_times.c -o $@
+
+hostlist.o:	hostlist.c hostlist.h
+	$(CC) $(CFLAGS) -c hostlist.c
 
 clean:
-	rm -f revdns soc_times
+	rm -f revdns soc_times hostlist.o

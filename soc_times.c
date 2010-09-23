@@ -9,14 +9,17 @@
 #include <ctype.h>
 #include <sys/time.h>
 
+#include "hostlist.h"
+
 void usage(void);
 void process_file(const char *,const char *);
 void connect_times(const char *,const char *);
 char * trimwhitespace(char *);
-void print_timediff(const struct timespec *,const struct timespec *);
+struct timespec * get_timediff(const struct timespec *,const struct timespec *);
 
 int connect_flag=0;
 int flag=0;
+hostnode *head = NULL;
 
 void usage(void) {
 	fprintf(stdout,"\n" \
@@ -28,16 +31,20 @@ void usage(void) {
 	);
 }
 
-void print_timediff(const struct timespec * end, const struct timespec * start) {
+struct timespec * get_timediff(const struct timespec * end, const struct timespec * start) {
 	time_t sec = (end->tv_sec) - (start->tv_sec);
 	long nsec;
+	struct timespec * tm = (struct timespec *)malloc(sizeof(struct timespec));
 	if(((end->tv_nsec) - (start->tv_nsec)) < 0) {
 		sec -= 1;
 		nsec = 100000000 - ((end->tv_nsec) - (start->tv_nsec));
 	} else {
 		nsec = ((end->tv_nsec) - (start->tv_nsec));
 	}
-	printf("Elapsed: %lu (sec) %lu (nsec)\n",(long)sec,nsec);
+	printf("Took: %lu sec(s) %lu nsecs\n",(long)sec,nsec);
+	tm->tv_sec = sec;
+	tm->tv_nsec = nsec;
+	return tm;
 }
 
 void process_file(const char * file,const char * port) {
@@ -66,7 +73,7 @@ void connect_times(const char * host,const char * port) {
 	struct timespec start,end;
 	struct addrinfo *res,*res0,hints;
 	int err;
-	printf("Now connecting to %s on port %s\n",host,port);
+	printf("Connecting to %s on port %s ",host,port);
 	memset(&hints,0,sizeof(struct addrinfo));
 	hints.ai_family = PF_INET;
 	hints.ai_socktype = SOCK_STREAM;
@@ -97,7 +104,7 @@ void connect_times(const char * host,const char * port) {
 			return;
 		}
 		close(sockfd);
-		print_timediff(&end,&start);
+		addhost(&head,newhostnode(host,get_timediff(&end,&start)));
 	}
 	freeaddrinfo(res0);
 }
@@ -127,6 +134,7 @@ int main(int argc, char * argv[]) {
 	
 	if(file_name && port) {
 		process_file(file_name,port);
+		find_smallestnode(head);
 		return EXIT_SUCCESS;;
 	} 
 	usage();
