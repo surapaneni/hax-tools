@@ -10,11 +10,13 @@
 #include <string.h>
 #include <netdb.h>
 #include <ctype.h>
+#include <sys/time.h>
 
 void usage(void);
 void process_file(const char *,const char *);
 void connect_times(const char *,const char *);
 char * trimwhitespace(char *);
+void print_timediff(const struct timespec *,const struct timespec *);
 
 int connect_flag=0;
 int flag=0;
@@ -27,6 +29,18 @@ void usage(void) {
 	"-p	connect port\n" \
 	"-?	print help\n"
 	);
+}
+
+void print_timediff(const struct timespec * end, const struct timespec * start) {
+	time_t sec = (end->tv_sec) - (start->tv_sec);
+	long nsec;
+	if(((end->tv_nsec) - (start->tv_nsec)) < 0) {
+		sec -= 1;
+		nsec = 100000000 - ((end->tv_nsec) - (start->tv_nsec));
+	} else {
+		nsec = ((end->tv_nsec) - (start->tv_nsec));
+	}
+	printf("Elapsed: %lu (sec) %lu (nsec)\n",(long)sec,nsec);
 }
 
 void process_file(const char * file,const char * port) {
@@ -51,7 +65,7 @@ void process_file(const char * file,const char * port) {
 }
 
 void connect_times(const char * host,const char * port) {
-	clock_t start,end;
+	struct timespec start,end;
 	struct addrinfo *res,*res0,hints;
 	int err;
 	printf("Now connecting to %s on port %s\n",host,port);
@@ -73,14 +87,15 @@ void connect_times(const char * host,const char * port) {
 			perror("socket");
 			continue;
 		}
-		start = clock();
+		err = clock_gettime(CLOCK_REALTIME,&start);
+		if(err) { perror("clock_gettime"); }
 		if(connect(sockfd,res->ai_addr,res->ai_addrlen)) {
 			perror("connect");
 			continue;
 		}
-		end = clock();
+		err = clock_gettime(CLOCK_REALTIME,&end);
 		close(sockfd);
-		printf("Elapsed: %lf\n",(double)(end - start));
+		print_timediff(&end,&start);
 	}
 	freeaddrinfo(res0);
 }
