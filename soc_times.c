@@ -4,18 +4,18 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string.h>
 #include <netdb.h>
 
 void usage(void);
-void process_file(const char *);
-void connect_times(const char *);
+void process_file(const char *,const char *);
+void connect_times(const char *,const char *);
 
 int connect_flag=0;
 int flag=0;
-int port=21;
 
 void usage(void) {
 	fprintf(stdout,"\n" \
@@ -27,7 +27,7 @@ void usage(void) {
 	);
 }
 
-void process_file(const char * file) {
+void process_file(const char * file,const char * port) {
 	FILE * fp;
 	char line[128];
 	if((fp = fopen(file,"r")) == NULL) {
@@ -39,55 +39,59 @@ void process_file(const char * file) {
 		fgets(line,sizeof(line),fp);
 		len = strlen(line);
 		line[len-1] = '\0';
-		connect_times(line);
+		connect_times(line,port);
 	}
 	
 
 }
 
-void connect_times(const char * host) {
+void connect_times(const char * host,const char * port) {
 	clock_t start,end;
-	double elapsed;
-	struct sockaddr_in servsock;
-	struct in_addr serv_addr;
-	int socfd;
-	struct hostent * hst;
-	printf("==== Now trying %s ====\n",host);
-	if((socfd = socket(PF_INET,SOCK_STREAM,0)) == -1) {
-		perror("socket");
-		exit(EXIT_FAILURE);
+	struct addrinfo *res,*res0,hints;
+	int err;
+	printf("Now connecting to %s on port %s\n",host,port);
+	memset(&hints,0,sizeof(struct addrinfo));
+	hints.ai_family = PF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	err = getaddrinfo(host,port,&hints,&res0);
+	if(err) {
+		printf("%s\n",gai_strerror(err));
+		return;
 	}
-	memset(&servsock,'\0',sizeof(servsock));
-	servsock.sin_family = AF_INET;
-	servsock.sin_port = htons(port);
-	if(inet_aton(host,&servsock.sin_addr) == 0) {
-		perror("inet_aton");
-		exit(EXIT_FAILURE);
+	for(res=res0;res;res=res->ai_next) {
+		int sockfd;
+		sockfd = socket(res->ai_family,res->ai_socktype,res->ai_protocol);
+		if(sockfd < 0) {
+			perror("socket");
+			continue;
+		}
+		start = clock();
+		if(connect(sockfd,res->ai_addr,res->ai_addrlen)) {
+			perror("connect");
+			continue;
+		}
+		end = clock();
+		close(sockfd);
+		printf("Elapsed: %lf\n",(double)(end - start));
 	}
-	start = clock();
-	if(connect(socfd,(const struct sockaddr *)&servsock,sizeof(struct sockaddr))) {
-		perror("connect");
-		exit(EXIT_FAILURE);
-	}
-	end = clock();
-	close(socfd);
-	elapsed = (double)( end - start);
-	printf("(connect) %s elapsed:%f \n",host,elapsed);	
+	freeaddrinfo(res0);
 }
 
 int main(int argc, char * argv[]) {
 	int ch;
-	char * file_name;
-
-	while((ch = getopt(argc,argv,"cf:hp:")) != -1) {
+	char * file_name = NULL;
+	char * port = NULL;
+	while((ch = getopt(argc,argv,"chf:p:")) != -1) {
 		switch(ch) {
 			case 'c':
 					connect_flag = 1;
+					break;
 			case 'f':
 					file_name = optarg;
 					break;
 			case 'p':
-					port = atoi(optarg);
+					port = optarg;
+					break;
 			case 'h':
 			case '?':
 			default:
@@ -97,7 +101,7 @@ int main(int argc, char * argv[]) {
 	}
 	
 	if(file_name) {
-		process_file(file_name);
+		process_file(file_name,port);
 	}
 	return 0;		
 }
