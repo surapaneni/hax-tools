@@ -29,17 +29,20 @@ void usage(void) {
 
 void process_file(const char * file,const char * port) {
 	FILE * fp;
-	char line[128];
+	char * line;
 	if((fp = fopen(file,"r")) == NULL) {
 		perror("fopen");
 		exit(EXIT_FAILURE);
 	}
 	while(!feof(fp)){
 		int len;
-		fgets(line,sizeof(line),fp);
+		line = (char *)calloc(1, 128 * sizeof(char));
+		fgets(line,128,fp);
 		len = strlen(line);
 		line[len-1] = '\0';
-		connect_times(line,port);
+		if(len) connect_times(line,port);
+		//printf("%s\n",line);
+		free(line);
 	}
 	
 
@@ -60,6 +63,9 @@ void connect_times(const char * host,const char * port) {
 	}
 	for(res=res0;res;res=res->ai_next) {
 		int sockfd;
+		if(res->ai_canonname) { 
+			printf("%s\n",res->ai_canonname);
+		}
 		sockfd = socket(res->ai_family,res->ai_socktype,res->ai_protocol);
 		if(sockfd < 0) {
 			perror("socket");
