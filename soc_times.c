@@ -9,10 +9,12 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <netdb.h>
+#include <ctype.h>
 
 void usage(void);
 void process_file(const char *,const char *);
 void connect_times(const char *,const char *);
+char * trimwhitespace(char *);
 
 int connect_flag=0;
 int flag=0;
@@ -29,7 +31,7 @@ void usage(void) {
 
 void process_file(const char * file,const char * port) {
 	FILE * fp;
-	char * line;
+	char *line,*line2;
 	if((fp = fopen(file,"r")) == NULL) {
 		perror("fopen");
 		exit(EXIT_FAILURE);
@@ -40,8 +42,8 @@ void process_file(const char * file,const char * port) {
 		fgets(line,128,fp);
 		len = strlen(line);
 		line[len-1] = '\0';
-		if(len) connect_times(line,port);
-		//printf("%s\n",line);
+		line2 = trimwhitespace(line);
+		if(line2) connect_times(line2,port);
 		free(line);
 	}
 	
@@ -110,4 +112,18 @@ int main(int argc, char * argv[]) {
 		process_file(file_name,port);
 	}
 	return 0;		
+}
+
+char * trimwhitespace(char * str) {
+	char * end;
+	while(isspace(*str)) str++;
+
+	if(*str == 0)
+		return NULL;
+
+	end = str + strlen(str) - 1;
+	while(end > str && isspace(*end)) end--;
+	*(end+1) = '\0';
+
+	return str;
 }
