@@ -64,10 +64,10 @@ void process_file(const char * file,const char * port) {
 		line[len-1] = '\0';
 		line2 = trimwhitespace(line);
 		if(line2 && connect_flag) connect_times(line2,port);
+		free(buf);
 		free(line);
 	}
-	
-
+	fclose(fp);	
 }
 
 void connect_times(const char * host,const char * port) {
@@ -136,6 +136,7 @@ int main(int argc, char * argv[]) {
 	if(file_name && port) {
 		process_file(file_name,port);
 		find_smallestnode(head);
+		free_hostlist(head);
 		return EXIT_SUCCESS;;
 	} 
 	usage();

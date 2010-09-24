@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "hostlist.h"
 
@@ -30,6 +31,15 @@ hostnode * newhostnode(const char * host, const struct timespec * tm) {
 	node->tm = *tm;
 	node->next = NULL;
 	return node;
+}
+
+void free_hostlist(hostnode * head) {
+	while(head) {
+		hostnode * node = head->next;
+		free(head->host);
+		free(head);
+		head = node;
+	}
 }
 
 void print_hostlist(hostnode * head) {
