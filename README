@@ -3,6 +3,6 @@ hax-tools:
 	
 	revdns: returns reverse-dns information over a given pool.
 
-	soc_times: returns POSIX Wall clock times for connect(2) for given IP's
+	fastest_mirror: Find the fastest mirror in list of hosts
 	
 	

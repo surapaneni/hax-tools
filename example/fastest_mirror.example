@@ -1,0 +1,4 @@
+./fastest_mirror -c -f hosts_ips -p 21
+	-- Displays the fastest mirror
+./fastest_mirror -c -f hosts_list -p "http" -v
+	-- Displays verbose information

@@ -7,6 +7,7 @@
 
 static hostnode * smallest;
 static int least_inited = 0;
+extern int verbose;
 
 int addhost(hostnode ** head,hostnode * node) {
 	if(!head) {
@@ -34,7 +35,7 @@ hostnode * newhostnode(const char * host, const struct timespec * tm) {
 void print_hostlist(hostnode * head) {
 	hostnode * list = head;
 	for(list = head; list ; list = list->next) {
-		printf("%s\n",list->host);
+		fprintf(stderr,"%s\n",list->host);
 	}
 }
 
@@ -62,7 +63,8 @@ void find_smallestnode(hostnode * head) {
 		//compare this node with smallest;
 		compare_and_swap_smallest(list);
 	}
-	printf("Smallest connect(2) time is for %s at ( %lu secs and %lu nano secs )\n",smallest->host,(unsigned long)smallest->tm.tv_sec,(unsigned long)smallest->tm.tv_nsec); 	
+	if(verbose) printf("Smallest connect(2) time is for %s at ( %lu secs and %lu nano secs )\n",smallest->host,(unsigned long)smallest->tm.tv_sec,(unsigned long)smallest->tm.tv_nsec); 	
+	printf("%s\n",smallest->host);
 }
 
 

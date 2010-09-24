@@ -19,6 +19,7 @@ struct timespec * get_timediff(const struct timespec *,const struct timespec *);
 
 int connect_flag=0;
 int flag=0;
+int verbose=0;
 hostnode *head = NULL;
 
 void usage(void) {
@@ -41,7 +42,7 @@ struct timespec * get_timediff(const struct timespec * end, const struct timespe
 	} else {
 		nsec = ((end->tv_nsec) - (start->tv_nsec));
 	}
-	printf("Took: %lu sec(s) %lu nsecs\n",(long)sec,nsec);
+	if(verbose) printf("Took: %lu sec(s) %lu nsecs\n",(long)sec,nsec);
 	tm->tv_sec = sec;
 	tm->tv_nsec = nsec;
 	return tm;
@@ -73,20 +74,17 @@ void connect_times(const char * host,const char * port) {
 	struct timespec start,end;
 	struct addrinfo *res,*res0,hints;
 	int err;
-	printf("Connecting to %s on port %s ",host,port);
+	if(verbose) printf("Connecting to %s on port %s ",host,port);
 	memset(&hints,0,sizeof(struct addrinfo));
 	hints.ai_family = PF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	err = getaddrinfo(host,port,&hints,&res0);
 	if(err) {
-		printf("%s\n",gai_strerror(err));
+		fprintf(stderr,"%s\n",gai_strerror(err));
 		return;
 	}
 	for(res=res0;res;res=res->ai_next) {
 		int sockfd;
-		if(res->ai_canonname) { 
-			printf("%s\n",res->ai_canonname);
-		}
 		sockfd = socket(res->ai_family,res->ai_socktype,res->ai_protocol);
 		if(sockfd < 0) {
 			perror("socket");
@@ -100,7 +98,7 @@ void connect_times(const char * host,const char * port) {
 		}
 		err = clock_gettime(CLOCK_REALTIME,&end);
 		if(err) {
-			printf("%s\n",gai_strerror(err));
+			fprintf(stderr,"%s\n",gai_strerror(err));
 			return;
 		}
 		close(sockfd);
@@ -113,7 +111,7 @@ int main(int argc, char * argv[]) {
 	int ch;
 	char * file_name = NULL;
 	char * port = NULL;
-	while((ch = getopt(argc,argv,"chf:p:")) != -1) {
+	while((ch = getopt(argc,argv,"chvf:p:")) != -1) {
 		switch(ch) {
 			case 'c':
 					connect_flag = 1;
@@ -123,6 +121,9 @@ int main(int argc, char * argv[]) {
 					break;
 			case 'p':
 					port = optarg;
+					break;
+			case 'v':
+					verbose = 1;
 					break;
 			case 'h':
 			case '?':
