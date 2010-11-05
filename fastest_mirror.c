@@ -64,7 +64,6 @@ void process_file(const char * file,const char * port) {
 		line[len-1] = '\0';
 		line2 = trimwhitespace(line);
 		if(line2 && connect_flag) connect_times(line2,port);
-		free(buf);
 		free(line);
 	}
 	fclose(fp);	
