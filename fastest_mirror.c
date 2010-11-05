@@ -98,7 +98,7 @@ void connect_times(const char * host,const char * port) {
 		}
 		err = clock_gettime(CLOCK_REALTIME,&end);
 		if(err) {
-			fprintf(stderr,"%s\n",gai_strerror(err));
+			perror("clock_gettime");
 			return;
 		}
 		close(sockfd);
