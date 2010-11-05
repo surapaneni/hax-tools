@@ -1,16 +1,10 @@
 CC=	gcc
 
-CFLAGS=	-std=c99 -Wall -Wextra -O2 -pipe
+CFLAGS=	-std=c99 -Wall -Wextra -O2 -pipe -D_BSD_SOURCE
 LDFLAGS=
 
-SYS_UNAME := $(shell uname -s)
-OS_FLAGS=	
-fastest_mirror_CFLAGS=	$(CFLAGS) -D_POSIX_C_SOURCE=200112L
+fastest_mirror_CFLAGS=	$(CFLAGS) -D_POSIX_C_SOURCE=200809L
 fastest_mirror_LDFLAGS=	$(LDFLAGS) -lrt
-
-ifeq ($(SYS_UNAME), Darwin)
-OS_FLAGS=	-D_DARWIN_C_SOURCE
-endif
 
 tools:	revdns fastest_mirror 
 
