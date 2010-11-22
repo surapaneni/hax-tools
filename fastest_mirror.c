@@ -21,14 +21,15 @@ int connect_flag=0;
 int flag=0;
 int verbose=0;
 hostnode *head = NULL;
+char * progname = NULL;
 
 void usage(void) {
-	fprintf(stdout,"\n" \
-	"-c	connect only\n" \
+	fprintf(stdout,"Usage:\t%s [OPTIONS] <file>\n" \
+	"-c		connect only\n" \
 	"-f <file>	read URL's from\n" \
-	"-h	print help\n" \
-	"-p	connect port\n" \
-	"-?	print help\n"
+	"-h		print help\n" \
+	"-p		connect port\n" \
+	"-?		print help\n", progname
 	);
 }
 
@@ -110,6 +111,7 @@ int main(int argc, char * argv[]) {
 	int ch;
 	char * file_name = NULL;
 	char * port = NULL;
+	progname = argv[0];
 	while((ch = getopt(argc,argv,"chvf:p:")) != -1) {
 		switch(ch) {
 			case 'c':
